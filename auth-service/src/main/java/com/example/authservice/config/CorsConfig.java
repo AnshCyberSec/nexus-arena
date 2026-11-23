@@ -22,9 +22,10 @@ public class CorsConfig {
                 "http://localhost:8080",
                 "https://*.ngrok-free.dev",
                 "https://*.ngrok-free.app",
-                "https://nexus-arena-g0dp.onrender.com", // <--- Ye apna Render backend URL hai
-                "https://*.onrender.com",                // <--- Ye future frontend ke liye
-                "*"                                      // <--- Filhal testing ke liye sab allow kar do
+                "https://nexus-arena-g0dp.onrender.com", // Tumhara backend
+                "https://*.onrender.com",                // Render services ke liye
+                "https://*.vercel.app",                  // Vercel (frontend) ke liye
+                "https://*.netlify.app"                  // Netlify (agar use karo toh)
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
