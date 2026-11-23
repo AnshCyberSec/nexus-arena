@@ -86,6 +86,7 @@ app:
 # Server Configuration
 server:
   port: ${PORT:8080}
+  address: 0.0.0.0   # <-- Ye line add karni hai
   error:
     include-message: never
     include-stacktrace: never
