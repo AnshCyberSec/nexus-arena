@@ -3,8 +3,10 @@ package com.example.authservice.config;
 import com.example.authservice.security.filter.JwtAuthenticationFilter;
 import com.example.authservice.security.filter.RateLimitFilter;
 import com.example.authservice.security.userdetails.CustomUserDetailsService;
+import org.springframework.boot.security.autoconfigure.actuate.web.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -53,8 +55,14 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // 1. CORS Preflight (OPTIONS) requests ko allow karo
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+
+                        // 2. Actuator endpoints ko securely allow karo
+                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
+
+                        // 3. Public APIs
                         .requestMatchers(
-                                "/actuator/health",
                                 "/api/v1/auth/register",
                                 "/api/v1/auth/login",
                                 "/api/v1/auth/refresh",
@@ -63,12 +71,16 @@ public class SecurityConfig {
                                 "/api/v1/auth/reset-password",
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/mfa/verify-login",
-                                "/ws/**", // <--- YAHAN DOUBLE STAR LAGAO
+                                "/ws/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
                         ).permitAll()
+
+                        // 4. Admin APIs
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+
+                        // 5. Baaki sab block
                         .anyRequest().authenticated()
                 )
                 .authenticationProvider(authenticationProvider())
