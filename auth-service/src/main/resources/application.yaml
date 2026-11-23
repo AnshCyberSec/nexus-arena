@@ -77,7 +77,10 @@ app:
 
 
   frontend:
-    base-url:  https://lovable-contortionistic-timika.ngrok-free.dev
+    base-url: https://nexus-arena-g0dp.onrender.com
+
+  resend:
+    api-key: ${RESEND_API_KEY}
 
 # Server Configuration
 server:
