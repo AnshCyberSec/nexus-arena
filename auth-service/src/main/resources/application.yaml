@@ -77,10 +77,11 @@ app:
 
 
   frontend:
-    base-url: https://nexus-arena-g0dp.onrender.com
+    base-url: https://nexus-arena-xyz.vercel.app
 
   resend:
     api-key: ${RESEND_API_KEY}
+    from-email: onboarding@resend.dev
 
 # Server Configuration
 server:
