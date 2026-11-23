@@ -49,6 +49,18 @@ export const authApi = {
     return axiosClient.post('/auth/reset-password', data);
   },
 
+    /**
+     * Verify email using token
+     * @param {Object} data - { token }
+     */
+     /**
+      * Verify email using token
+      * @param {Object} data - { token }
+      */
+     verifyEmail: (data) => {
+       return axiosClient.post('/auth/verify-email', { token: data.token });
+     },
+
   /**
    * Get current user profile (Protected)
    */

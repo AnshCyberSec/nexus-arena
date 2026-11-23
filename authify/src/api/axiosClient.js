@@ -1,8 +1,10 @@
 // src/api/axiosClient.js
 import axios from 'axios';
 
-// Base URL - Vite environment variable se aayega, fallback localhost
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
+// Production: relative URL (Vercel rewrite -> Render). Local: localhost backend.
+const baseURL =
+  import.meta.env.VITE_API_BASE_URL ||
+  (import.meta.env.PROD ? '/api/v1' : 'http://localhost:8080/api/v1');
 
 const axiosClient = axios.create({
   baseURL,

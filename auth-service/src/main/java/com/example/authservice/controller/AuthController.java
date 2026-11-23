@@ -15,6 +15,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -31,11 +32,16 @@ public class AuthController {
     private final AuthService authService;
     private final TokenService tokenService;
     private final UserMapper userMapper;
+    private final String frontendBaseUrl;
 
-    public AuthController(AuthService authService, TokenService tokenService, UserMapper userMapper) {
+    public AuthController(AuthService authService,
+                          TokenService tokenService,
+                          UserMapper userMapper,
+                          @Value("${app.frontend.base-url}") String frontendBaseUrl) {
         this.authService = authService;
         this.tokenService = tokenService;
         this.userMapper = userMapper;
+        this.frontendBaseUrl = frontendBaseUrl;
     }
 
     @PostMapping("/register")
@@ -179,15 +185,14 @@ public class AuthController {
                 .build());
     }
 
-    // 1. GET: Mobile/Email link se aane par frontend par bhejega
+    // GET: Email link se aane par frontend ke reset page pe bhejta hai
     @GetMapping("/reset-password")
     public RedirectView redirectToResetPassword(@RequestParam("token") String token) {
-        // Yahan apna Ngrok FRONTEND URL dalna (localhost:5173 nahi chalega mobile me)
-        String frontendUrl = "http://localhost:5173/reset-password?token=" + token;
+        String frontendUrl = frontendBaseUrl + "/reset-password?token=" + token;
         return new RedirectView(frontendUrl);
     }
 
-    // 2. POST: Frontend jab naya password bhejega toh ye chalega (YEH MISSING THA)
+    // POST: Frontend naya password bhejta hai
     @PostMapping("/reset-password")
     public ResponseEntity<ApiResponse<Void>> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
         authService.resetPassword(request);
