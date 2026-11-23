@@ -11,7 +11,9 @@ const pendingSends = [];
 const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 const WS_URL =
   import.meta.env.VITE_WS_URL ||
-  apiBase.replace(/\/api\/v1\/?$/, '').replace(/^http/, 'ws') + '/ws/websocket';
+  (import.meta.env.PROD
+    ? 'wss://nexus-arena-g0dp.onrender.com/ws-native'
+    : 'ws://localhost:8080/ws-native');
 
 const attachRoom = (roomId, entry) => {
   if (!stompClient || !stompClient.connected) return;
