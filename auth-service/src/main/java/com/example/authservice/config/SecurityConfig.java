@@ -72,6 +72,7 @@ public class SecurityConfig {
                                 "/api/v1/auth/logout",
                                 "/api/v1/auth/mfa/verify-login",
                                 "/ws/**",
+                                "/ws-native/**",
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html"
