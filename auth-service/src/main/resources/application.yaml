@@ -79,9 +79,9 @@ app:
   frontend:
     base-url: https://nexus-arena-xyz.vercel.app
 
-  resend:
-    api-key: ${RESEND_API_KEY}
-    from-email: onboarding@resend.dev
+  brevo: # <--- Resend ki jagah Brevo
+    api-key: ${BREVO_API_KEY}
+    from-email: anshumananshuman63@gmail.com
 
 # Server Configuration
 # Server Configuration
