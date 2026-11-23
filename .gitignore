@@ -1,16 +1,22 @@
+# IntelliJ
+.idea/
+*.iml
+
 # Backend
 auth-service/target/
 auth-service/.idea/
-auth-service/*.iml
-auth-service/*.log
 
 # Frontend
 authify/node_modules/
 authify/dist/
 authify/.env
-authify/.env.local
-authify/*.log
+authify/.env.*
+authify/src/.env
+!authify/.env.example
 
-# OS
-.DS_Store
-Thumbs.db
+# Logs
+*.log
+
+# Environment files
+.env
+.env.*
