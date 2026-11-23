@@ -77,7 +77,7 @@ app:
 
 
   frontend:
-    base-url: https://nexus-arena-xyz.vercel.app
+    base-url: https://nexus-arena-lovat.vercel.app
 
   brevo: # <--- Resend ki jagah Brevo
     api-key: ${BREVO_API_KEY}
