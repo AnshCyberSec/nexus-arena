@@ -21,19 +21,19 @@ public class CorsConfig {
                 "http://localhost:5173",
                 "http://localhost:8080",
                 "https://*.ngrok-free.dev",
-                "https://*.ngrok-free.app"
+                "https://*.ngrok-free.app",
+                "https://nexus-arena-g0dp.onrender.com", // <--- Ye apna Render backend URL hai
+                "https://*.onrender.com",                // <--- Ye future frontend ke liye
+                "*"                                      // <--- Filhal testing ke liye sab allow kar do
         ));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        // "*" mat daalna headers me, specific rakho
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin"));
         configuration.setExposedHeaders(List.of("Authorization"));
         configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-
-        // YEH LINE WEBSOCKET KE LIYE ZAROORI HAI
         source.registerCorsConfiguration("/ws/**", configuration);
 
         return source;
