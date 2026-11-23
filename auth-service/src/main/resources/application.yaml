@@ -84,9 +84,10 @@ app:
     from-email: onboarding@resend.dev
 
 # Server Configuration
+# Server Configuration
 server:
   port: ${PORT:8080}
-  address: 0.0.0.0   # <-- Ye line add karni hai
+  address: 0.0.0.0
   error:
     include-message: never
     include-stacktrace: never
