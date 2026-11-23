@@ -1,0 +1,108 @@
+spring:
+  application:
+    name: auth-service
+
+  # Database Configuration
+  datasource:
+    url: jdbc:postgresql://localhost:5433/auth_db?options=-c%20timezone=Asia/Kolkata
+    username: ${DB_USERNAME:auth_user}
+    password: ${DB_PASSWORD:auth_secret_password}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 20000
+      idle-timeout: 300000
+      max-lifetime: 1200000
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: anshumananshuman63@gmail.com
+    password: stkfofzgzxgvaeyn
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+  # JPA / Hibernate Configuration
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: UTC
+        jdbc.batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  # Flyway Configuration
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+    locations: classpath:db/migration
+    validate-on-migrate: true
+
+  # Redis Configuration
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 2000ms
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+
+# Custom App Properties
+app:
+  security:
+    jwt:
+      private-key-path: classpath:jwt_private.pem
+      public-key-path: classpath:jwt_public.pem
+      access-token-expiration-minutes: 15
+      refresh-token-expiration-days: 7
+      issuer: auth-service
+
+  admin:
+    email: ${ADMIN_EMAIL:admin@example.com}      # Default admin@example.com
+    password: ${ADMIN_PASSWORD:Admin@123}
+
+
+  frontend:
+    base-url:  https://lovable-contortionistic-timika.ngrok-free.dev
+
+# Server Configuration
+server:
+  port: 8080
+  error:
+    include-message: never
+    include-stacktrace: never
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: always
+
+
+# Logging Configuration
+logging:
+  level:
+    root: INFO
+    com.example.authservice: DEBUG
+    org.springframework.security: INFO
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
