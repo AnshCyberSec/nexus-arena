@@ -1,16 +1,73 @@
+
 <div align="center">
 
-  <img src="https://raw.githubusercontent.com/AnshCyberSec/nexus-arena/main/authify/public/icons.svg" width="100" alt="Nexus Arena Logo" />
-  
-  # ⚡ NEXUS ARENA ⚡
-  
-  **A Next-Generation, Ultra-Secure Authentication & Real-Time Multiplayer Gaming Platform.**
-  
-  <p align="center">
-    <i>Bank-level security meets real-time gaming. Built with enterprise architecture.</i>
+  <img src="https://raw.githubusercontent.com/AnshCyberSec/nexus-arena/main/authify/public/icons.svg" width="115" alt="Nexus Arena Logo" />
+
+  <h1>⚡ NEXUS ARENA ⚡</h1>
+
+  <h3>THE FUTURE OF SECURE MULTIPLAYER GAMING</h3>
+
+  <p>
+    <b>One Platform. Infinite Possibilities. Zero Compromises.</b>
   </p>
 
+  <p>
+    An Enterprise-Grade Authentication Ecosystem<br/>
+    Combined With an Immersive Real-Time Multiplayer Gaming Experience.
+  </p>
+
+  <br/>
+
+  <a href="https://nexus-arena-lovat.vercel.app/login">
+    <img src="https://img.shields.io/badge/▶_PLAY_NEXUS_ARENA-FF5722?style=for-the-badge&logo=vercel&logoColor=white&labelColor=171329" height="55" alt="Play Nexus Arena"/>
+  </a>
+
+  <br/>
+  <br/>
+
+  <p>
+    <b>ENTER THE ARENA • CHALLENGE YOUR FRIENDS • EXPERIENCE THE FUTURE</b>
+  </p>
+
+  <br/>
+
+  <img src="https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Spring_Boot_3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
+
+  <br/>
+
+  <img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
+  <img src="https://img.shields.io/badge/WebSocket-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
+
+  <br/>
+  <br/>
+
+  <p>
+    🔐 <b>Enterprise Security</b>
+    &nbsp; • &nbsp;
+    🎮 <b>Real-Time Multiplayer</b>
+    &nbsp; • &nbsp;
+    ⚡ <b>Cloud Deployment</b>
+  </p>
+
+  <br/>
+
+  <a href="https://github.com/AnshCyberSec/nexus-arena">
+    <img src="https://img.shields.io/badge/VIEW_SOURCE_CODE-181717?style=for-the-badge&logo=github&logoColor=white"/>
+  </a>
+
+  <a href="https://github.com/AnshCyberSec/nexus-arena/stargazers">
+    <img src="https://img.shields.io/github/stars/AnshCyberSec/nexus-arena?style=for-the-badge&logo=github&color=gold&label=STARS"/>
+  </a>
+
 </div>
+
+---
+
 
 ---
 
