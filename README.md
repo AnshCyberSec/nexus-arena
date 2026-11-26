@@ -637,14 +637,14 @@ mindmap
     Security Engineering
       RSA-256 JWT
       Refresh Token Rotation
-      MFA / TOTP
+      MFA and TOTP
       RBAC
       Rate Limiting
     Real-Time Systems
       WebSocket
       STOMP
       Multiplayer Rooms
-      Live Game State
+      Live Game Updates
     Data Engineering
       PostgreSQL
       Hibernate
@@ -658,7 +658,7 @@ mindmap
     Deployment
       Docker
       Vercel
-      Render / Fly.io
+      Render or Fly.io
       Supabase
 ```
 
