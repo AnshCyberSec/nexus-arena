@@ -479,40 +479,35 @@ flowchart TB
 ## 10. COMPLETE PROJECT DIRECTORY
 
 ```mermaid
-flowchart TB
-    ROOT["nexus-arena/"]
+flowchart TD
+    ROOT["nexus-arena"]
+    ROOT --> BE["auth-service"]
+    ROOT --> FE["authify"]
 
-    ROOT --> BACKEND["auth-service/"]
-    ROOT --> FRONTEND["authify/"]
+    BE --> JAVA["src/main/java/com/example/authservice"]
+    BE --> RES["src/main/resources"]
+    BE --> DOCKER["Dockerfile"]
 
-    subgraph BACKEND_STRUCTURE["SPRING BOOT BACKEND"]
-        BACKEND --> B_SRC["src/main/java/com/example/authservice/"]
-        BACKEND --> B_RES["src/main/resources/"]
-        BACKEND --> DOCKER["Dockerfile"]
+    JAVA --> CONFIG["config"]
+    JAVA --> CONTROLLER["controller"]
+    JAVA --> ENTITY["entity"]
+    JAVA --> SECURITY["security"]
+    JAVA --> SERVICE["service"]
+    JAVA --> REPOSITORY["repository"]
 
-        B_SRC --> CONFIG["config/"]
-        B_SRC --> CONTROLLER["controller/"]
-        B_SRC --> ENTITY["entity/"]
-        B_SRC --> SECURITY["security/"]
-        B_SRC --> SERVICE["service/"]
-        B_SRC --> REPOSITORY["repository/"]
+    RES --> MIGRATION["db/migration"]
+    RES --> YAML["application.yaml"]
 
-        B_RES --> MIGRATION["db/migration/"]
-        B_RES --> YAML["application.yaml"]
-    end
+    FE --> SRC["src"]
+    FE --> TAILWIND["tailwind.config.js"]
+    FE --> VITE["vite.config.js"]
 
-    subgraph FRONTEND_STRUCTURE["REACT FRONTEND"]
-        FRONTEND --> F_SRC["src/"]
-        FRONTEND --> TAILWIND["tailwind.config.js"]
-        FRONTEND --> VITE["vite.config.js"]
-
-        F_SRC --> API["api/"]
-        F_SRC --> COMPONENTS["components/"]
-        F_SRC --> CONTEXT["context/"]
-        F_SRC --> PAGES["pages/"]
-        F_SRC --> ROUTES["routes/"]
-        F_SRC --> UTILS["utils/"]
-    end
+    SRC --> API["api"]
+    SRC --> COMPONENTS["components"]
+    SRC --> CONTEXT["context"]
+    SRC --> PAGES["pages"]
+    SRC --> ROUTES["routes"]
+    SRC --> UTILS["utils"]
 ```
 
 ---
@@ -520,34 +515,24 @@ flowchart TB
 ## 11. CLOUD DEPLOYMENT ARCHITECTURE
 
 ```mermaid
-flowchart TB
-    USER(["END USER"])
+flowchart TD
+    USER(["End User"])
 
-    subgraph CLOUD["CLOUD INFRASTRUCTURE"]
-        VERCEL["VERCEL<br/>React Frontend"]
+    USER -->|"HTTPS"| VERCEL["Vercel - React Frontend"]
 
-        subgraph BACKEND_HOST["RENDER / FLY.IO"]
-            BACKEND["Spring Boot Backend"]
-            REST["REST API"]
-            SOCKET["WebSocket Server"]
-        end
+    VERCEL -->|"REST API Requests"| BACKEND["Spring Boot Backend"]
+    VERCEL <-->|"WebSocket Connection"| BACKEND
 
-        DB[("SUPABASE<br/>PostgreSQL")]
-        REDIS[("UPSTASH<br/>Redis")]
-        SMTP["GMAIL SMTP<br/>Email Delivery"]
+    BACKEND -->|"Database Operations"| DB[("Supabase PostgreSQL")]
+    BACKEND -->|"Caching and Rate Limiting"| REDIS[("Upstash Redis")]
+    BACKEND -->|"Email Delivery"| SMTP["Gmail SMTP"]
+
+    subgraph HOSTING["BACKEND HOSTING"]
+        BACKEND
+        HOST["Render or Fly.io"]
     end
 
-    USER -->|"HTTPS"| VERCEL
-
-    VERCEL -->|"REST Requests"| REST
-    VERCEL <-->|"WebSocket Connection"| SOCKET
-
-    REST --> BACKEND
-    SOCKET --> BACKEND
-
-    BACKEND -->|"Database Operations"| DB
-    BACKEND -->|"Caching and Rate Limiting"| REDIS
-    BACKEND -->|"Email Notifications"| SMTP
+    HOST -.-> BACKEND
 ```
 
 ---
@@ -555,7 +540,7 @@ flowchart TB
 ## 12. FEATURE COMPLETION MAP
 
 ```mermaid
-flowchart TB
+flowchart TD
     ROOT["NEXUS ARENA"]
 
     ROOT --> SECURITY["SECURITY AND AUTHENTICATION"]
@@ -563,39 +548,31 @@ flowchart TB
     ROOT --> INFRA["INFRASTRUCTURE"]
     ROOT --> DEPLOY["CLOUD DEPLOYMENT"]
 
-    subgraph SECURITY_FEATURES["SECURITY FEATURES"]
-        SECURITY --> S1["RSA-256 JWT Authentication"]
-        SECURITY --> S2["Refresh Token Rotation"]
-        SECURITY --> S3["Two-Factor Authentication"]
-        SECURITY --> S4["OTP Verification"]
-        SECURITY --> S5["HttpOnly Cookies"]
-        SECURITY --> S6["Account Lockout"]
-        SECURITY --> S7["Email Verification"]
-        SECURITY --> S8["Role-Based Access Control"]
-        SECURITY --> S9["Redis Rate Limiting"]
-    end
+    SECURITY --> S1["RSA-256 JWT Authentication"]
+    SECURITY --> S2["Refresh Token Rotation"]
+    SECURITY --> S3["Two-Factor Authentication"]
+    SECURITY --> S4["OTP Verification"]
+    SECURITY --> S5["HttpOnly Cookies"]
+    SECURITY --> S6["Account Lockout"]
+    SECURITY --> S7["Email Verification"]
+    SECURITY --> S8["Role-Based Access Control"]
+    SECURITY --> S9["Redis Rate Limiting"]
 
-    subgraph GAME_FEATURES["GAME FEATURES"]
-        GAME --> G1["WebSocket Integration"]
-        GAME --> G2["Private Game Rooms"]
-        GAME --> G3["6-Digit Room Codes"]
-        GAME --> G4["Real-Time Game Updates"]
-        GAME --> G5["Victory Animations"]
-    end
+    GAME --> G1["WebSocket Integration"]
+    GAME --> G2["Private Game Rooms"]
+    GAME --> G3["6-Digit Room Codes"]
+    GAME --> G4["Real-Time Game Updates"]
+    GAME --> G5["Victory Animations"]
 
-    subgraph INFRA_FEATURES["INFRASTRUCTURE"]
-        INFRA --> I1["PostgreSQL"]
-        INFRA --> I2["Redis"]
-        INFRA --> I3["Flyway Migrations"]
-        INFRA --> I4["Docker"]
-    end
+    INFRA --> I1["PostgreSQL"]
+    INFRA --> I2["Redis"]
+    INFRA --> I3["Flyway Migrations"]
+    INFRA --> I4["Docker"]
 
-    subgraph DEPLOY_FEATURES["DEPLOYMENT"]
-        DEPLOY --> D1["Vercel Frontend"]
-        DEPLOY --> D2["Cloud Backend"]
-        DEPLOY --> D3["Supabase Database"]
-        DEPLOY --> D4["Upstash Redis"]
-    end
+    DEPLOY --> D1["Vercel Frontend"]
+    DEPLOY --> D2["Cloud Backend"]
+    DEPLOY --> D3["Supabase Database"]
+    DEPLOY --> D4["Upstash Redis"]
 ```
 
 ---
@@ -604,22 +581,26 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    START(["START DEVELOPMENT"])
+    START(["Start Development"])
 
     START --> CLONE["Clone GitHub Repository"]
-    CLONE --> DB["Configure PostgreSQL"]
-    DB --> REDIS["Configure Redis"]
-    REDIS --> BACKEND["Navigate to auth-service"]
+    CLONE --> CONFIG["Configure Environment"]
 
-    BACKEND --> BUILD["mvn clean install"]
-    BUILD --> RUNBACK["mvn spring-boot:run"]
+    CONFIG --> DB["Start PostgreSQL"]
+    CONFIG --> REDIS["Start Redis"]
 
-    RUNBACK --> FRONTEND["Navigate to authify"]
-    FRONTEND --> INSTALL["npm install"]
-    INSTALL --> RUNFRONT["npm run dev"]
+    DB --> BACKEND["Open auth-service"]
+    REDIS --> BACKEND
 
-    RUNFRONT --> TEST["Test Authentication & Multiplayer"]
-    TEST --> END(["APPLICATION RUNNING"])
+    BACKEND --> BUILD["Run mvn clean install"]
+    BUILD --> RUNBE["Run mvn spring-boot:run"]
+
+    RUNBE --> FRONTEND["Open authify"]
+    FRONTEND --> INSTALL["Run npm install"]
+    INSTALL --> RUNFE["Run npm run dev"]
+
+    RUNFE --> TEST["Test Authentication and Multiplayer"]
+    TEST --> END(["Application Running"])
 ```
 
 ### COMMAND REFERENCE
