@@ -199,24 +199,23 @@ flowchart TB
 
 ```mermaid
 flowchart TD
-    A["Client Sends Refresh Token"]
-    B["Validate Token"]
-    C{"Token Valid?"}
+    A["Client sends refresh token"] --> B["Validate refresh token"]
+    B --> C{"Token valid?"}
 
-    A --> B
-    B --> C
+    C -->|No| D["Reject refresh request"]
+    C -->|Yes| E{"Token previously used?"}
 
-    C -->|No| DENY["Reject Refresh Request"]
-    C -->|Yes| CHECK{"Previously Used?"}
+    E -->|Yes| F["Detect token reuse"]
+    F --> G["Revoke entire token family"]
+    G --> H["Record security event in audit log"]
+    H --> I["Require user to authenticate again"]
 
-    CHECK -->|Yes| REVOKE["Revoke Entire Token Family"]
-    CHECK -->|No| ROTATE["Generate New Refresh Token"]
-
-    ROTATE --> SAVE["Persist New Token"]
-    SAVE --> RESPONSE["Return New Access Token"]
-    RESPONSE --> END(["New Authenticated Session"])
-
-    REVOKE --> ALERT["Security Event / Audit Log"]
+    E -->|No| J["Generate new refresh token"]
+    J --> K["Mark old token as used"]
+    K --> L["Persist new refresh token"]
+    L --> M["Generate new access token"]
+    M --> N["Return new access token and refresh cookie"]
+    N --> O(["Authenticated session continues"])
 ```
 
 ---
@@ -228,35 +227,38 @@ flowchart TB
     P1(["PLAYER X"])
     P2(["PLAYER O"])
 
-    subgraph FRONTEND["REACT GAME CLIENT"]
-        BOARD1["Player X Game Board"]
-        BOARD2["Player O Game Board"]
+    subgraph FRONTEND["REACT FRONTEND"]
+        B1["Player X Game Board"]
+        B2["Player O Game Board"]
+        C1["WebSocket Client"]
     end
 
-    subgraph BACKEND["SPRING BOOT GAME SERVER"]
-        ENDPOINT["WebSocket Endpoint /ws"]
+    subgraph BACKEND["SPRING BOOT BACKEND"]
+        WS["WebSocket Endpoint /ws"]
         STOMP["STOMP Message Handler"]
-        ROOM["Room Management"]
-        STATE["Game State Management"]
+        ROOM["Game Room Management"]
         VALIDATE["Move Validation"]
+        STATE["Game State Management"]
     end
 
-    P1 --> BOARD1
-    P2 --> BOARD2
+    P1 --> B1
+    P2 --> B2
 
-    BOARD1 -->|"Join / Move"| ENDPOINT
-    BOARD2 -->|"Join / Move"| ENDPOINT
+    B1 --> C1
+    B2 --> C1
 
-    ENDPOINT --> STOMP
+    C1 -->|"Join Room / Submit Move"| WS
+    WS --> STOMP
     STOMP --> ROOM
     ROOM --> VALIDATE
     VALIDATE --> STATE
 
-    STATE -->|"Broadcast Updated State"| STOMP
-    STOMP --> ENDPOINT
+    STATE -->|"Updated Game State"| STOMP
+    STOMP --> WS
+    WS -->|"Broadcast Update"| C1
 
-    ENDPOINT --> BOARD1
-    ENDPOINT --> BOARD2
+    C1 --> B1
+    C1 --> B2
 ```
 
 ### GAME LIFECYCLE
@@ -264,17 +266,22 @@ flowchart TB
 ```mermaid
 stateDiagram-v2
     [*] --> RoomCreated
+
     RoomCreated --> WaitingForPlayer
     WaitingForPlayer --> PlayerJoined
     PlayerJoined --> GameStarted
+
     GameStarted --> PlayerXTurn
-    PlayerXTurn --> PlayerOTurn: Valid Move
-    PlayerOTurn --> PlayerXTurn: Valid Move
-    PlayerXTurn --> GameFinished: Win / Draw
-    PlayerOTurn --> GameFinished: Win / Draw
-    GameFinished --> RoomReset: Reset Requested
-    RoomReset --> GameStarted
-    GameFinished --> [*]
+    PlayerXTurn --> PlayerOTurn: Valid move
+    PlayerOTurn --> PlayerXTurn: Valid move
+
+    PlayerXTurn --> GameFinished: Win or draw
+    PlayerOTurn --> GameFinished: Win or draw
+
+    GameFinished --> RoomReset: Reset requested
+    RoomReset --> WaitingForPlayer: New game
+
+    GameFinished --> [*]: Exit room
 ```
 
 ---
@@ -282,22 +289,41 @@ stateDiagram-v2
 ## 07. WEBSOCKET EVENT COMMUNICATION
 
 ```mermaid
-flowchart LR
-    CLIENT["React Client"]
-    SERVER["Spring WebSocket"]
-    HANDLER["STOMP Handler"]
-    ROOM["Game Room"]
+sequenceDiagram
+    autonumber
 
-    CLIENT -->|"Connect /ws"| SERVER
-    SERVER --> HANDLER
+    participant X as Player X
+    participant C as React Client
+    participant S as Spring WebSocket
+    participant H as STOMP Handler
+    participant R as Game Room
+    participant O as Player O
 
-    HANDLER -->|"Join Room"| ROOM
-    HANDLER -->|"Submit Move"| ROOM
-    HANDLER -->|"Reset Request"| ROOM
+    X->>C: Join game room
+    C->>S: Connect to /ws
+    S->>H: Establish STOMP connection
 
-    ROOM -->|"Updated Game State"| HANDLER
-    HANDLER -->|"Publish Event"| SERVER
-    SERVER -->|"Subscribe /topic/game/{roomId}"| CLIENT
+    C->>S: Send /app/game/{roomId}/join
+    S->>H: Process join request
+    H->>R: Add player to room
+
+    O->>S: Join same room
+    S->>H: Process second player
+    H->>R: Update room membership
+
+    C->>S: Send /app/game/{roomId}/move
+    S->>H: Process player move
+    H->>R: Validate and update game
+
+    R-->>H: Updated game state
+    H-->>S: Publish game event
+    S-->>C: /topic/game/{roomId}
+    S-->>O: /topic/game/{roomId}
+
+    C->>S: Send /app/game/{roomId}/reset
+    S->>H: Process reset request
+    H->>R: Reset game state
+    R-->>S: Broadcast reset state
 ```
 
 ---
@@ -306,40 +332,58 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    APP["AUTHENTICATION APPLICATION"]
+    APP["NEXUS ARENA AUTHENTICATION SERVICE"]
 
-    APP --> USERS[("users")]
-    APP --> ROLES[("roles")]
-    APP --> REFRESH[("refresh_tokens")]
-    APP --> EMAIL[("email_verification_tokens")]
-    APP --> RESET[("password_reset_tokens")]
-    APP --> OTP[("otp_verification")]
-    APP --> LOGIN[("login_attempts")]
-    APP --> AUDIT[("audit_logs")]
+    subgraph DATABASE["POSTGRESQL DATABASE"]
+        USERS[("users")]
+        ROLES[("roles")]
+        USER_ROLES[("user_roles")]
+        REFRESH[("refresh_tokens")]
+        EMAIL[("email_verification_tokens")]
+        RESET[("password_reset_tokens")]
+        OTP[("otp_verification")]
+        LOGIN[("login_attempts")]
+        AUDIT[("audit_logs")]
+    end
 
-    USERS --> USERROLE[("user_roles")]
-    ROLES --> USERROLE
+    APP --> USERS
+    APP --> ROLES
+    APP --> REFRESH
+    APP --> EMAIL
+    APP --> RESET
+    APP --> OTP
+    APP --> LOGIN
+    APP --> AUDIT
 
-    USERS -.->|"User Identity"| REFRESH
-    USERS -.->|"Verification"| EMAIL
-    USERS -.->|"Password Recovery"| RESET
-    USERS -.->|"MFA / OTP"| OTP
-    USERS -.->|"Login Tracking"| LOGIN
-    USERS -.->|"Security Events"| AUDIT
+    USERS --> USER_ROLES
+    ROLES --> USER_ROLES
+
+    USERS -.->|"User identity"| REFRESH
+    USERS -.->|"Email verification"| EMAIL
+    USERS -.->|"Password recovery"| RESET
+    USERS -.->|"MFA and OTP"| OTP
+    USERS -.->|"Login tracking"| LOGIN
+    USERS -.->|"Security activity"| AUDIT
 ```
 
 ### DATABASE TECHNOLOGIES
 
 ```mermaid
 flowchart LR
-    JPA["Spring Data JPA"]
-    HIBERNATE["Hibernate ORM"]
-    POSTGRES[("PostgreSQL")]
-    FLYWAY["Flyway Migrations"]
+    APP["Spring Boot Application"]
 
-    JPA --> HIBERNATE
-    HIBERNATE --> POSTGRES
-    FLYWAY --> POSTGRES
+    subgraph DATA_LAYER["PERSISTENCE LAYER"]
+        JPA["Spring Data JPA"]
+        ORM["Hibernate ORM"]
+        FLYWAY["Flyway Migrations"]
+    end
+
+    DB[("PostgreSQL Database")]
+
+    APP --> JPA
+    JPA --> ORM
+    ORM <-->|"Read / Write"| DB
+    FLYWAY -->|"Schema versioning"| DB
 ```
 
 ---
@@ -348,49 +392,86 @@ flowchart LR
 
 ```mermaid
 flowchart TB
-    API["/api/v1"]
+    ROOT["REST API /api/v1"]
 
-    API --> AUTH["/auth"]
-    API --> USERS["/users"]
-    API --> ADMIN["/admin"]
+    ROOT --> AUTH["AUTH CONTROLLER"]
+    ROOT --> USERS["USER CONTROLLER"]
+    ROOT --> ADMIN["ADMIN CONTROLLER"]
 
-    AUTH --> A1["POST /register"]
-    AUTH --> A2["POST /login"]
-    AUTH --> A3["POST /refresh"]
-    AUTH --> A4["POST /logout"]
-    AUTH --> A5["POST /mfa/verify-login"]
-    AUTH --> A6["GET /me"]
-    AUTH --> A7["GET /verify-email"]
-    AUTH --> A8["POST /forgot-password"]
-    AUTH --> A9["POST /reset-password"]
+    subgraph AUTH_API["AUTHENTICATION ENDPOINTS"]
+        A1["POST /register"]
+        A2["POST /login"]
+        A3["POST /refresh"]
+        A4["POST /logout"]
+        A5["POST /mfa/verify-login"]
+        A6["GET /me"]
+        A7["GET /verify-email"]
+        A8["POST /forgot-password"]
+        A9["POST /reset-password"]
+    end
 
-    USERS --> U1["POST /change-password"]
-    USERS --> U2["POST /change-email"]
-    USERS --> U3["POST /mfa/setup"]
-    USERS --> U4["POST /mfa/verify"]
-    USERS --> U5["POST /mfa/disable"]
-    USERS --> U6["POST /otp/send"]
-    USERS --> U7["POST /otp/verify"]
+    subgraph USER_API["USER ENDPOINTS"]
+        U1["POST /change-password"]
+        U2["POST /change-email"]
+        U3["POST /mfa/setup"]
+        U4["POST /mfa/verify"]
+        U5["POST /mfa/disable"]
+        U6["POST /otp/send"]
+        U7["POST /otp/verify"]
+    end
 
-    ADMIN --> D1["GET /"]
-    ADMIN --> D2["POST /users/{userId}/lock"]
-    ADMIN --> D3["POST /users/{userId}/unlock"]
-    ADMIN --> D4["PATCH /users/{userId}/roles"]
+    subgraph ADMIN_API["ADMIN ENDPOINTS - ROLE_ADMIN"]
+        D1["GET /"]
+        D2["POST /users/{userId}/lock"]
+        D3["POST /users/{userId}/unlock"]
+        D4["PATCH /users/{userId}/roles"]
+    end
+
+    AUTH --> A1
+    AUTH --> A2
+    AUTH --> A3
+    AUTH --> A4
+    AUTH --> A5
+    AUTH --> A6
+    AUTH --> A7
+    AUTH --> A8
+    AUTH --> A9
+
+    USERS --> U1
+    USERS --> U2
+    USERS --> U3
+    USERS --> U4
+    USERS --> U5
+    USERS --> U6
+    USERS --> U7
+
+    ADMIN --> D1
+    ADMIN --> D2
+    ADMIN --> D3
+    ADMIN --> D4
 ```
 
 ### WEBSOCKET API
 
 ```mermaid
 flowchart TB
-    WS["WEBSOCKET /ws"]
-    WS --> APP["APPLICATION DESTINATION"]
-    WS --> TOPIC["SUBSCRIPTION DESTINATION"]
+    WS["WebSocket Endpoint /ws"]
+
+    WS --> APP["APPLICATION DESTINATIONS"]
+    WS --> TOPIC["SUBSCRIPTION DESTINATIONS"]
 
     APP --> JOIN["/app/game/{roomId}/join"]
     APP --> MOVE["/app/game/{roomId}/move"]
     APP --> RESET["/app/game/{roomId}/reset"]
 
     TOPIC --> GAME["/topic/game/{roomId}"]
+
+    JOIN --> HANDLER["STOMP Message Handler"]
+    MOVE --> HANDLER
+    RESET --> HANDLER
+
+    HANDLER --> BROADCAST["Publish Updated Game State"]
+    BROADCAST --> GAME
 ```
 
 ---
@@ -399,35 +480,39 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    ROOT["nexus-arena"]
+    ROOT["nexus-arena/"]
 
-    ROOT --> BACKEND["auth-service"]
-    ROOT --> FRONTEND["authify"]
+    ROOT --> BACKEND["auth-service/"]
+    ROOT --> FRONTEND["authify/"]
 
-    BACKEND --> JAVA["src/main/java/com/example/authservice"]
-    BACKEND --> RESOURCES["src/main/resources"]
-    BACKEND --> DOCKER["Dockerfile"]
+    subgraph BACKEND_STRUCTURE["SPRING BOOT BACKEND"]
+        BACKEND --> B_SRC["src/main/java/com/example/authservice/"]
+        BACKEND --> B_RES["src/main/resources/"]
+        BACKEND --> DOCKER["Dockerfile"]
 
-    JAVA --> CONFIG["config"]
-    JAVA --> CONTROLLER["controller"]
-    JAVA --> ENTITY["entity"]
-    JAVA --> SECURITY["security"]
-    JAVA --> SERVICE["service"]
-    JAVA --> REPOSITORY["repository"]
+        B_SRC --> CONFIG["config/"]
+        B_SRC --> CONTROLLER["controller/"]
+        B_SRC --> ENTITY["entity/"]
+        B_SRC --> SECURITY["security/"]
+        B_SRC --> SERVICE["service/"]
+        B_SRC --> REPOSITORY["repository/"]
 
-    RESOURCES --> MIGRATION["db/migration"]
-    RESOURCES --> YAML["application.yaml"]
+        B_RES --> MIGRATION["db/migration/"]
+        B_RES --> YAML["application.yaml"]
+    end
 
-    FRONTEND --> SRC["src"]
-    FRONTEND --> TAILWIND["tailwind.config.js"]
-    FRONTEND --> VITE["vite.config.js"]
+    subgraph FRONTEND_STRUCTURE["REACT FRONTEND"]
+        FRONTEND --> F_SRC["src/"]
+        FRONTEND --> TAILWIND["tailwind.config.js"]
+        FRONTEND --> VITE["vite.config.js"]
 
-    SRC --> API["api"]
-    SRC --> COMPONENTS["components"]
-    SRC --> CONTEXT["context"]
-    SRC --> PAGES["pages"]
-    SRC --> ROUTES["routes"]
-    SRC --> UTILS["utils"]
+        F_SRC --> API["api/"]
+        F_SRC --> COMPONENTS["components/"]
+        F_SRC --> CONTEXT["context/"]
+        F_SRC --> PAGES["pages/"]
+        F_SRC --> ROUTES["routes/"]
+        F_SRC --> UTILS["utils/"]
+    end
 ```
 
 ---
@@ -440,19 +525,29 @@ flowchart TB
 
     subgraph CLOUD["CLOUD INFRASTRUCTURE"]
         VERCEL["VERCEL<br/>React Frontend"]
-        BACKEND["RENDER / FLY.IO<br/>Spring Boot Backend"]
-        SUPABASE[("SUPABASE<br/>PostgreSQL")]
-        UPSTASH[("UPSTASH<br/>Redis")]
+
+        subgraph BACKEND_HOST["RENDER / FLY.IO"]
+            BACKEND["Spring Boot Backend"]
+            REST["REST API"]
+            SOCKET["WebSocket Server"]
+        end
+
+        DB[("SUPABASE<br/>PostgreSQL")]
+        REDIS[("UPSTASH<br/>Redis")]
         SMTP["GMAIL SMTP<br/>Email Delivery"]
     end
 
-    USER --> VERCEL
-    VERCEL -->|"HTTPS / REST"| BACKEND
-    VERCEL <-->|"WebSocket"| BACKEND
+    USER -->|"HTTPS"| VERCEL
 
-    BACKEND --> SUPABASE
-    BACKEND --> UPSTASH
-    BACKEND --> SMTP
+    VERCEL -->|"REST Requests"| REST
+    VERCEL <-->|"WebSocket Connection"| SOCKET
+
+    REST --> BACKEND
+    SOCKET --> BACKEND
+
+    BACKEND -->|"Database Operations"| DB
+    BACKEND -->|"Caching and Rate Limiting"| REDIS
+    BACKEND -->|"Email Notifications"| SMTP
 ```
 
 ---
@@ -461,38 +556,46 @@ flowchart TB
 
 ```mermaid
 flowchart TB
-    ROOT["NEXUS ARENA DEVELOPMENT"]
+    ROOT["NEXUS ARENA"]
 
-    ROOT --> SECURITY["SECURITY & AUTHENTICATION"]
+    ROOT --> SECURITY["SECURITY AND AUTHENTICATION"]
     ROOT --> GAME["MULTIPLAYER GAMING"]
     ROOT --> INFRA["INFRASTRUCTURE"]
-    ROOT --> DEPLOY["DEPLOYMENT"]
+    ROOT --> DEPLOY["CLOUD DEPLOYMENT"]
 
-    SECURITY --> S1["JWT Authentication"]
-    SECURITY --> S2["Refresh Token Rotation"]
-    SECURITY --> S3["Two-Factor Authentication"]
-    SECURITY --> S4["OTP Verification"]
-    SECURITY --> S5["HttpOnly Cookies"]
-    SECURITY --> S6["Account Lockout"]
-    SECURITY --> S7["Email Verification"]
-    SECURITY --> S8["RBAC"]
-    SECURITY --> S9["Redis Rate Limiting"]
+    subgraph SECURITY_FEATURES["SECURITY FEATURES"]
+        SECURITY --> S1["RSA-256 JWT Authentication"]
+        SECURITY --> S2["Refresh Token Rotation"]
+        SECURITY --> S3["Two-Factor Authentication"]
+        SECURITY --> S4["OTP Verification"]
+        SECURITY --> S5["HttpOnly Cookies"]
+        SECURITY --> S6["Account Lockout"]
+        SECURITY --> S7["Email Verification"]
+        SECURITY --> S8["Role-Based Access Control"]
+        SECURITY --> S9["Redis Rate Limiting"]
+    end
 
-    GAME --> G1["WebSocket Integration"]
-    GAME --> G2["Private Game Rooms"]
-    GAME --> G3["6-Digit Room Codes"]
-    GAME --> G4["Live Game Updates"]
-    GAME --> G5["Victory Animations"]
+    subgraph GAME_FEATURES["GAME FEATURES"]
+        GAME --> G1["WebSocket Integration"]
+        GAME --> G2["Private Game Rooms"]
+        GAME --> G3["6-Digit Room Codes"]
+        GAME --> G4["Real-Time Game Updates"]
+        GAME --> G5["Victory Animations"]
+    end
 
-    INFRA --> I1["PostgreSQL"]
-    INFRA --> I2["Redis"]
-    INFRA --> I3["Flyway"]
-    INFRA --> I4["Docker"]
+    subgraph INFRA_FEATURES["INFRASTRUCTURE"]
+        INFRA --> I1["PostgreSQL"]
+        INFRA --> I2["Redis"]
+        INFRA --> I3["Flyway Migrations"]
+        INFRA --> I4["Docker"]
+    end
 
-    DEPLOY --> D1["Vercel Frontend"]
-    DEPLOY --> D2["Cloud Backend"]
-    DEPLOY --> D3["Supabase Database"]
-    DEPLOY --> D4["Upstash Redis"]
+    subgraph DEPLOY_FEATURES["DEPLOYMENT"]
+        DEPLOY --> D1["Vercel Frontend"]
+        DEPLOY --> D2["Cloud Backend"]
+        DEPLOY --> D3["Supabase Database"]
+        DEPLOY --> D4["Upstash Redis"]
+    end
 ```
 
 ---
