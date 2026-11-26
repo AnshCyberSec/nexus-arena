@@ -1,291 +1,599 @@
+# ⚡ NEXUS ARENA — SYSTEM ARCHITECTURE
 
-<div align="center">
-
-  <img src="https://raw.githubusercontent.com/AnshCyberSec/nexus-arena/main/authify/public/icons.svg" width="115" alt="Nexus Arena Logo" />
-
-  <h1>⚡ NEXUS ARENA ⚡</h1>
-
-  <h3>THE FUTURE OF SECURE MULTIPLAYER GAMING</h3>
-
-  <p>
-    <b>One Platform. Infinite Possibilities. Zero Compromises.</b>
-  </p>
-
-  <p>
-    An Enterprise-Grade Authentication Ecosystem<br/>
-    Combined With an Immersive Real-Time Multiplayer Gaming Experience.
-  </p>
-
-  <br/>
-
-  <a href="https://nexus-arena-lovat.vercel.app/login">
-    <img src="https://img.shields.io/badge/▶_PLAY_NEXUS_ARENA-FF5722?style=for-the-badge&logo=vercel&logoColor=white&labelColor=171329" height="55" alt="Play Nexus Arena"/>
-  </a>
-
-  <br/>
-  <br/>
-
-  <p>
-    <b>ENTER THE ARENA • CHALLENGE YOUR FRIENDS • EXPERIENCE THE FUTURE</b>
-  </p>
-
-  <br/>
-
-  <img src="https://img.shields.io/badge/Java_21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Spring_Boot_3-6DB33F?style=for-the-badge&logo=springboot&logoColor=white"/>
-  <img src="https://img.shields.io/badge/React_18-61DAFB?style=for-the-badge&logo=react&logoColor=black"/>
-  <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white"/>
-
-  <br/>
-
-  <img src="https://img.shields.io/badge/Spring_Security-6DB33F?style=for-the-badge&logo=springsecurity&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
-  <img src="https://img.shields.io/badge/WebSocket-010101?style=for-the-badge&logo=socketdotio&logoColor=white"/>
-  <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white"/>
-
-  <br/>
-  <br/>
-
-  <p>
-    🔐 <b>Enterprise Security</b>
-    &nbsp; • &nbsp;
-    🎮 <b>Real-Time Multiplayer</b>
-    &nbsp; • &nbsp;
-    ⚡ <b>Cloud Deployment</b>
-  </p>
-
-  <br/>
-
-  <a href="https://github.com/AnshCyberSec/nexus-arena">
-    <img src="https://img.shields.io/badge/VIEW_SOURCE_CODE-181717?style=for-the-badge&logo=github&logoColor=white"/>
-  </a>
-
-  <a href="https://github.com/AnshCyberSec/nexus-arena/stargazers">
-    <img src="https://img.shields.io/github/stars/AnshCyberSec/nexus-arena?style=for-the-badge&logo=github&color=gold&label=STARS"/>
-  </a>
-
-</div>
+### Secure Authentication Ecosystem + Real-Time Multiplayer Gaming Platform
 
 ---
 
+## 01. PROJECT OVERVIEW
 
----
+```mermaid
+flowchart TB
+    ROOT(["⚡ NEXUS ARENA"])
 
-## 🚀 About The Project
+    ROOT --> AUTH["AUTHIFY<br/>Secure Identity Platform"]
+    ROOT --> GAME["MULTIPLAYER ARENA<br/>Real-Time Gaming"]
 
-**Nexus Arena** is not just another authentication system. It is a full-stack, production-ready application that demonstrates how a modern, secure web application should be built. It features **Military-Grade Security** (JWT, MFA, HttpOnly Cookies, Rate Limiting) combined with a **Real-Time Multiplayer Tic-Tac-Toe Arena** powered by WebSockets.
+    AUTH --> A1["JWT Authentication"]
+    AUTH --> A2["MFA / OTP Verification"]
+    AUTH --> A3["Refresh Token Rotation"]
+    AUTH --> A4["RBAC & Account Security"]
 
-Whether you are here to test the seamless authentication flow or to challenge a friend in the arena, Nexus Arena delivers an ultra-premium, buttery-smooth experience.
+    GAME --> G1["Private Game Rooms"]
+    GAME --> G2["6-Digit Room Codes"]
+    GAME --> G3["Live Game Synchronization"]
+    GAME --> G4["Victory Animations"]
 
----
+    classDef root fill:#172554,stroke:#60a5fa,color:#fff,stroke-width:3px
+    classDef module fill:#312e81,stroke:#818cf8,color:#fff
+    classDef feature fill:#064e3b,stroke:#34d399,color:#fff
 
-## 🛠️ Tech Stack & Architecture
-
-### **Frontend (The Art of UI/UX)**
-*   **Framework:** React 18 + Vite (Lightning fast)
-*   **Styling:** Tailwind CSS (Custom "Nexus" Deep Violet & Gold Theme)
-*   **State Management:** React Context API
-*   **Real-Time:** `@stomp/stompjs` + `SockJS`
-*   **Animations:** Canvas Confetti, Custom CSS Keyframes
-*   **API Client:** Axios (with Interceptors for silent token refresh)
-
-### **Backend (The Iron Fortress)**
-*   **Framework:** Java 21 + Spring Boot 3
-*   **Security:** Spring Security 6, RSA-256 Signed JWT, OAuth2, MFA (TOTP)
-*   **Real-Time:** Spring WebSocket (STOMP Protocol)
-*   **Database:** PostgreSQL + Hibernate/JPA + Flyway Migrations
-*   **Caching & Rate Limiting:** Redis (Upstash)
-*   **Email Service:** JavaMail (SMTP via Gmail)
-*   **API Docs:** Swagger / OpenAPI 3
-
----
-
-## 🗄️ Database Schema (Flyway Migrations)
-
-Our database architecture is highly normalized and handles everything from auth tokens to audit logs.
-
-| Table Name | Purpose / Description |
-| :--- | :--- |
-| `users` | Stores core user details, account status, MFA secrets, and lockout timestamps. |
-| `roles` & `user_roles` | RBAC implementation mapping users to specific roles (USER, ADMIN). |
-| `refresh_tokens` | Tracks token rotation, family IDs, and revocation for absolute session security. |
-| `email_verification_tokens` | One-time secure tokens for email verification. |
-| `password_reset_tokens` | Expiring tokens for password resets with usage tracking. |
-| `otp_verification` | Stores hashed 6-digit OTPs for sensitive operations with attempt counters. |
-| `login_attempts` | Tracks successful and failed logins (IP + UserAgent) for brute-force detection. |
-| `audit_logs` | System-wide immutable logs tracking critical events (e.g., USER_REGISTERED, PASSWORD_CHANGED). |
-
----
-
-## 🔌 API Endpoints (Backend)
-
-### 🔐 Authentication Endpoints (`/api/v1/auth`)
-*   `POST /register` - Register a new user.
-*   `POST /login` - Authenticate and receive JWT + HttpOnly Refresh Cookie.
-*   `POST /refresh` - Rotate refresh token for a new access token.
-*   `POST /logout` - Revoke refresh token and clear cookies.
-*   `POST /mfa/verify-login` - Complete login flow if MFA is enabled.
-*   `GET /me` - Fetch current authenticated user profile.
-*   `GET /verify-email?token=...` - Verify email via link.
-*   `POST /forgot-password` - Request a password reset link.
-*   `POST /reset-password` - Reset password using secure token.
-
-### 👤 User Management (`/api/v1/users`)
-*   `POST /change-password` - Update password with current password verification.
-*   `POST /change-email` - Request email change (triggers re-verification).
-*   `POST /mfa/setup` - Generate QR code and secret for 2FA.
-*   `POST /mfa/verify` - Verify and enable 2FA.
-*   `POST /mfa/disable` - Disable 2FA (requires current code).
-*   `POST /otp/send?purpose=...` - Send OTP to the authenticated user.
-*   `POST /otp/verify` - Verify the 6-digit OTP.
-
-### 🛡️ Admin Operations (`/api/v1/admin` - Requires ROLE_ADMIN)
-*   `GET /` - Fetch paginated list of all users.
-*   `POST /users/{userId}/lock` - Lock a user account.
-*   `POST /users/{userId}/unlock` - Unlock a user account.
-*   `PATCH /users/{userId}/roles` - Change roles assigned to a user.
-
-### 🎮 Real-Time WebSockets (`/ws` & `/app`)
-*   `STOMP /app/game/{roomId}/join` - Join a room (Assigns X or O).
-*   `STOMP /app/game/{roomId}/move` - Make a move on the board.
-*   `STOMP /app/game/{roomId}/reset` - Request game reset.
-*   `SUBSCRIBE /topic/game/{roomId}` - Listen to game state changes.
-
----
-
-## ✨ Ultimate Feature List
-
-### 🔐 Security & Authentication (Enterprise Grade)
-- [x] **Advanced JWT Auth:** Stateless authentication using RSA-256 asymmetric keys.
-- [x] **Refresh Token Rotation:** Secure token rotation with reuse detection (revokes entire family on theft).
-- [x] **Two-Factor Authentication (2FA):** Google Authenticator support via TOTP.
-- [x] **HttpOnly Cookies:** Refresh tokens stored securely to prevent XSS attacks.
-- [x] **Account Lockout:** Brute-force protection (locks account for 15 mins after 5 failed attempts).
-- [x] **Email Verification:** Secure token-based email verification & password reset.
-- [x] **OTP Service:** 6-digit Time-based OTP generation for sensitive actions.
-- [x] **Role-Based Access Control (RBAC):** Admin and User roles with protected routes.
-- [x] **Rate Limiting:** Custom Redis-based rate limiting filter to prevent DDoS.
-
-### 🎮 Real-Time Multiplayer Arena
-- [x] **WebSocket Integration:** Instantaneous move updates across continents.
-- [x] **Room Management:** Create private rooms and invite friends via 6-digit codes.
-- [x] **Cinematic Victory Screen:** Confetti blasts, dynamic sounds, and win/loss animations.
-- [x] **Interactive Dashboard:** Track your MFA status, account details, and jump into the arena.
-
----
-
-## 📂 Project Structure
-
-```text
-nexus-arena/
-│
-├── auth-service/              # ☕ Java Spring Boot Backend
-│   ├── src/main/java/com/example/authservice/
-│   │   ├── config/            # Security, CORS, WebSocket, Redis Configs
-│   │   ├── controller/        # REST APIs & WebSocket Controllers
-│   │   ├── entity/            # JPA Entities (User, Token, AuditLog)
-│   │   ├── security/          # JWT Filters, KeyProviders, Custom UserDetails
-│   │   ├── service/           # Business Logic (Auth, MFA, Email, Token)
-│   │   └── repository/        # Spring Data JPA Interfaces
-│   ├── src/main/resources/
-│   │   ├── db/migration/      # Flyway SQL Scripts (V1, V2, V3)
-│   │   └── application.yaml   # Environment Configs
-│   └── Dockerfile             # Containerization
-│
-└── authify/                   # ⚛️ React Frontend
-    ├── src/
-    │   ├── api/               # Axios & WebSocket Setup
-    │   ├── components/        # Reusable UI (Button, Input, Navbar, Game Board)
-    │   ├── context/           # Global State (AuthContext)
-    │   ├── pages/             # Auth, Dashboard, Admin, Online Game
-    │   ├── routes/            # Protected & Public Routes
-    │   └── utils/             # Validators, Constants, Sound Engine
-    ├── tailwind.config.js     # Custom Theme & Animations
-    └── vite.config.js         # Proxy & Build Config
+    class ROOT root
+    class AUTH,GAME module
+    class A1,A2,A3,A4,G1,G2,G3,G4 feature
 ```
 
 ---
 
-## 🚀 Quick Start (Run Locally)
+## 02. COMPLETE TECHNOLOGY STACK
 
-Follow these steps to set up and run **Nexus Arena** on your local machine.
+```mermaid
+flowchart TB
+    ROOT["NEXUS ARENA TECHNOLOGY STACK"]
 
-### 1. Backend Setup (Spring Boot)
+    ROOT --> FRONTEND["FRONTEND"]
+    ROOT --> BACKEND["BACKEND"]
+    ROOT --> DATABASE["DATA LAYER"]
+    ROOT --> INFRA["INFRASTRUCTURE"]
 
-**Step 1: Clone the Repository**
+    FRONTEND --> F1["React 18"]
+    FRONTEND --> F2["Vite"]
+    FRONTEND --> F3["Tailwind CSS"]
+    FRONTEND --> F4["Context API"]
+    FRONTEND --> F5["Axios"]
+    FRONTEND --> F6["STOMP + SockJS"]
+
+    BACKEND --> B1["Java 21"]
+    BACKEND --> B2["Spring Boot 3"]
+    BACKEND --> B3["Spring Security 6"]
+    BACKEND --> B4["Spring WebSocket"]
+    BACKEND --> B5["Hibernate / JPA"]
+    BACKEND --> B6["Swagger / OpenAPI"]
+
+    DATABASE --> D1[("PostgreSQL")]
+    DATABASE --> D2[("Redis")]
+    DATABASE --> D3["Flyway Migrations"]
+
+    INFRA --> I1["Docker"]
+    INFRA --> I2["Vercel"]
+    INFRA --> I3["Render / Fly.io"]
+    INFRA --> I4["Supabase"]
+    INFRA --> I5["Upstash Redis"]
+    INFRA --> I6["Gmail SMTP"]
+
+    classDef root fill:#172554,stroke:#60a5fa,color:#fff
+    classDef category fill:#312e81,stroke:#818cf8,color:#fff
+    classDef tech fill:#1f2937,stroke:#64748b,color:#fff
+
+    class ROOT root
+    class FRONTEND,BACKEND,DATABASE,INFRA category
+    class F1,F2,F3,F4,F5,F6,B1,B2,B3,B4,B5,B6,D1,D2,D3,I1,I2,I3,I4,I5,I6 tech
+```
+
+---
+
+## 03. HIGH-LEVEL SYSTEM ARCHITECTURE
+
+```mermaid
+flowchart TB
+    USER(["USER / PLAYER"])
+
+    subgraph CLIENT["CLIENT LAYER"]
+        UI["React Application"]
+        CONTEXT["Authentication Context"]
+        AXIOS["Axios API Client"]
+        SOCKET["STOMP / SockJS Client"]
+    end
+
+    subgraph SERVER["SPRING BOOT BACKEND"]
+        API["REST Controllers"]
+        FILTER["Security Filter Chain"]
+        AUTH["Authentication Service"]
+        MFA["MFA / OTP Service"]
+        TOKEN["JWT / Refresh Token Service"]
+        GAME["Game Room Service"]
+        WS["WebSocket Handler"]
+        MAIL["Email Service"]
+    end
+
+    subgraph STORAGE["DATA LAYER"]
+        DB[("PostgreSQL")]
+        REDIS[("Redis")]
+        MIGRATION["Flyway"]
+    end
+
+    USER --> UI
+    UI --> CONTEXT
+    UI --> AXIOS
+    UI --> SOCKET
+
+    AXIOS --> API
+    API --> FILTER
+    FILTER --> AUTH
+    AUTH --> MFA
+    AUTH --> TOKEN
+
+    SOCKET <-->|"STOMP / WebSocket"| WS
+    WS --> GAME
+
+    AUTH --> DB
+    MFA --> DB
+    TOKEN --> DB
+    GAME --> DB
+
+    AUTH --> REDIS
+    API --> MAIL
+    MIGRATION --> DB
+```
+
+---
+
+## 04. AUTHENTICATION & SECURITY FLOW
+
+```mermaid
+flowchart TD
+    START(["USER LOGIN"])
+    INPUT["Submit Email & Password"]
+    API["POST /api/v1/auth/login"]
+    SECURITY["Spring Security"]
+    VERIFY{"Credentials Valid?"}
+
+    START --> INPUT
+    INPUT --> API
+    API --> SECURITY
+    SECURITY --> VERIFY
+
+    VERIFY -->|No| REJECT["Reject Login"]
+    VERIFY -->|Yes| ACCOUNT{"Account Locked?"}
+
+    ACCOUNT -->|Yes| BLOCK["Account Access Denied"]
+    ACCOUNT -->|No| MFA{"MFA Enabled?"}
+
+    MFA -->|Yes| OTP["Verify TOTP Code"]
+    OTP --> OTPVALID{"OTP Valid?"}
+    OTPVALID -->|No| REJECT
+    OTPVALID -->|Yes| TOKEN["Generate RSA-256 JWT"]
+
+    MFA -->|No| TOKEN
+
+    TOKEN --> REFRESH["Generate Refresh Token"]
+    REFRESH --> COOKIE["Set HttpOnly Cookie"]
+    COOKIE --> SUCCESS(["AUTHENTICATED SESSION"])
+```
+
+### SECURITY COMPONENTS
+
+```mermaid
+flowchart TB
+    SECURITY["SECURITY ENGINE"]
+
+    SECURITY --> JWT["RSA-256 JWT"]
+    SECURITY --> ROTATION["Refresh Token Rotation"]
+    SECURITY --> MFA["TOTP Multi-Factor Authentication"]
+    SECURITY --> OTP["Six-Digit OTP"]
+    SECURITY --> COOKIE["HttpOnly Cookies"]
+    SECURITY --> LOCK["Account Lockout"]
+    SECURITY --> RBAC["Role-Based Access Control"]
+    SECURITY --> RATE["Redis Rate Limiting"]
+    SECURITY --> EMAIL["Email Verification"]
+
+    classDef main fill:#172554,stroke:#60a5fa,color:#fff
+    classDef feature fill:#064e3b,stroke:#34d399,color:#fff
+
+    class SECURITY main
+    class JWT,ROTATION,MFA,OTP,COOKIE,LOCK,RBAC,RATE,EMAIL feature
+```
+
+---
+
+## 05. REFRESH TOKEN ROTATION
+
+```mermaid
+flowchart TD
+    A["Client Sends Refresh Token"]
+    B["Validate Token"]
+    C{"Token Valid?"}
+
+    A --> B
+    B --> C
+
+    C -->|No| DENY["Reject Refresh Request"]
+    C -->|Yes| CHECK{"Previously Used?"}
+
+    CHECK -->|Yes| REVOKE["Revoke Entire Token Family"]
+    CHECK -->|No| ROTATE["Generate New Refresh Token"]
+
+    ROTATE --> SAVE["Persist New Token"]
+    SAVE --> RESPONSE["Return New Access Token"]
+    RESPONSE --> END(["New Authenticated Session"])
+
+    REVOKE --> ALERT["Security Event / Audit Log"]
+```
+
+---
+
+## 06. REAL-TIME MULTIPLAYER GAME ARCHITECTURE
+
+```mermaid
+flowchart TB
+    P1(["PLAYER X"])
+    P2(["PLAYER O"])
+
+    subgraph FRONTEND["REACT GAME CLIENT"]
+        BOARD1["Player X Game Board"]
+        BOARD2["Player O Game Board"]
+    end
+
+    subgraph BACKEND["SPRING BOOT GAME SERVER"]
+        ENDPOINT["WebSocket Endpoint /ws"]
+        STOMP["STOMP Message Handler"]
+        ROOM["Room Management"]
+        STATE["Game State Management"]
+        VALIDATE["Move Validation"]
+    end
+
+    P1 --> BOARD1
+    P2 --> BOARD2
+
+    BOARD1 -->|"Join / Move"| ENDPOINT
+    BOARD2 -->|"Join / Move"| ENDPOINT
+
+    ENDPOINT --> STOMP
+    STOMP --> ROOM
+    ROOM --> VALIDATE
+    VALIDATE --> STATE
+
+    STATE -->|"Broadcast Updated State"| STOMP
+    STOMP --> ENDPOINT
+
+    ENDPOINT --> BOARD1
+    ENDPOINT --> BOARD2
+```
+
+### GAME LIFECYCLE
+
+```mermaid
+stateDiagram-v2
+    [*] --> RoomCreated
+    RoomCreated --> WaitingForPlayer
+    WaitingForPlayer --> PlayerJoined
+    PlayerJoined --> GameStarted
+    GameStarted --> PlayerXTurn
+    PlayerXTurn --> PlayerOTurn: Valid Move
+    PlayerOTurn --> PlayerXTurn: Valid Move
+    PlayerXTurn --> GameFinished: Win / Draw
+    PlayerOTurn --> GameFinished: Win / Draw
+    GameFinished --> RoomReset: Reset Requested
+    RoomReset --> GameStarted
+    GameFinished --> [*]
+```
+
+---
+
+## 07. WEBSOCKET EVENT COMMUNICATION
+
+```mermaid
+flowchart LR
+    CLIENT["React Client"]
+    SERVER["Spring WebSocket"]
+    HANDLER["STOMP Handler"]
+    ROOM["Game Room"]
+
+    CLIENT -->|"Connect /ws"| SERVER
+    SERVER --> HANDLER
+
+    HANDLER -->|"Join Room"| ROOM
+    HANDLER -->|"Submit Move"| ROOM
+    HANDLER -->|"Reset Request"| ROOM
+
+    ROOM -->|"Updated Game State"| HANDLER
+    HANDLER -->|"Publish Event"| SERVER
+    SERVER -->|"Subscribe /topic/game/{roomId}"| CLIENT
+```
+
+---
+
+## 08. DATABASE ARCHITECTURE
+
+```mermaid
+flowchart TB
+    APP["AUTHENTICATION APPLICATION"]
+
+    APP --> USERS[("users")]
+    APP --> ROLES[("roles")]
+    APP --> REFRESH[("refresh_tokens")]
+    APP --> EMAIL[("email_verification_tokens")]
+    APP --> RESET[("password_reset_tokens")]
+    APP --> OTP[("otp_verification")]
+    APP --> LOGIN[("login_attempts")]
+    APP --> AUDIT[("audit_logs")]
+
+    USERS --> USERROLE[("user_roles")]
+    ROLES --> USERROLE
+
+    USERS -.->|"User Identity"| REFRESH
+    USERS -.->|"Verification"| EMAIL
+    USERS -.->|"Password Recovery"| RESET
+    USERS -.->|"MFA / OTP"| OTP
+    USERS -.->|"Login Tracking"| LOGIN
+    USERS -.->|"Security Events"| AUDIT
+```
+
+### DATABASE TECHNOLOGIES
+
+```mermaid
+flowchart LR
+    JPA["Spring Data JPA"]
+    HIBERNATE["Hibernate ORM"]
+    POSTGRES[("PostgreSQL")]
+    FLYWAY["Flyway Migrations"]
+
+    JPA --> HIBERNATE
+    HIBERNATE --> POSTGRES
+    FLYWAY --> POSTGRES
+```
+
+---
+
+## 09. BACKEND API ARCHITECTURE
+
+```mermaid
+flowchart TB
+    API["/api/v1"]
+
+    API --> AUTH["/auth"]
+    API --> USERS["/users"]
+    API --> ADMIN["/admin"]
+
+    AUTH --> A1["POST /register"]
+    AUTH --> A2["POST /login"]
+    AUTH --> A3["POST /refresh"]
+    AUTH --> A4["POST /logout"]
+    AUTH --> A5["POST /mfa/verify-login"]
+    AUTH --> A6["GET /me"]
+    AUTH --> A7["GET /verify-email"]
+    AUTH --> A8["POST /forgot-password"]
+    AUTH --> A9["POST /reset-password"]
+
+    USERS --> U1["POST /change-password"]
+    USERS --> U2["POST /change-email"]
+    USERS --> U3["POST /mfa/setup"]
+    USERS --> U4["POST /mfa/verify"]
+    USERS --> U5["POST /mfa/disable"]
+    USERS --> U6["POST /otp/send"]
+    USERS --> U7["POST /otp/verify"]
+
+    ADMIN --> D1["GET /"]
+    ADMIN --> D2["POST /users/{userId}/lock"]
+    ADMIN --> D3["POST /users/{userId}/unlock"]
+    ADMIN --> D4["PATCH /users/{userId}/roles"]
+```
+
+### WEBSOCKET API
+
+```mermaid
+flowchart TB
+    WS["WEBSOCKET /ws"]
+    WS --> APP["APPLICATION DESTINATION"]
+    WS --> TOPIC["SUBSCRIPTION DESTINATION"]
+
+    APP --> JOIN["/app/game/{roomId}/join"]
+    APP --> MOVE["/app/game/{roomId}/move"]
+    APP --> RESET["/app/game/{roomId}/reset"]
+
+    TOPIC --> GAME["/topic/game/{roomId}"]
+```
+
+---
+
+## 10. COMPLETE PROJECT DIRECTORY
+
+```mermaid
+flowchart TB
+    ROOT["nexus-arena"]
+
+    ROOT --> BACKEND["auth-service"]
+    ROOT --> FRONTEND["authify"]
+
+    BACKEND --> JAVA["src/main/java/com/example/authservice"]
+    BACKEND --> RESOURCES["src/main/resources"]
+    BACKEND --> DOCKER["Dockerfile"]
+
+    JAVA --> CONFIG["config"]
+    JAVA --> CONTROLLER["controller"]
+    JAVA --> ENTITY["entity"]
+    JAVA --> SECURITY["security"]
+    JAVA --> SERVICE["service"]
+    JAVA --> REPOSITORY["repository"]
+
+    RESOURCES --> MIGRATION["db/migration"]
+    RESOURCES --> YAML["application.yaml"]
+
+    FRONTEND --> SRC["src"]
+    FRONTEND --> TAILWIND["tailwind.config.js"]
+    FRONTEND --> VITE["vite.config.js"]
+
+    SRC --> API["api"]
+    SRC --> COMPONENTS["components"]
+    SRC --> CONTEXT["context"]
+    SRC --> PAGES["pages"]
+    SRC --> ROUTES["routes"]
+    SRC --> UTILS["utils"]
+```
+
+---
+
+## 11. CLOUD DEPLOYMENT ARCHITECTURE
+
+```mermaid
+flowchart TB
+    USER(["END USER"])
+
+    subgraph CLOUD["CLOUD INFRASTRUCTURE"]
+        VERCEL["VERCEL<br/>React Frontend"]
+        BACKEND["RENDER / FLY.IO<br/>Spring Boot Backend"]
+        SUPABASE[("SUPABASE<br/>PostgreSQL")]
+        UPSTASH[("UPSTASH<br/>Redis")]
+        SMTP["GMAIL SMTP<br/>Email Delivery"]
+    end
+
+    USER --> VERCEL
+    VERCEL -->|"HTTPS / REST"| BACKEND
+    VERCEL <-->|"WebSocket"| BACKEND
+
+    BACKEND --> SUPABASE
+    BACKEND --> UPSTASH
+    BACKEND --> SMTP
+```
+
+---
+
+## 12. FEATURE COMPLETION MAP
+
+```mermaid
+flowchart TB
+    ROOT["NEXUS ARENA DEVELOPMENT"]
+
+    ROOT --> SECURITY["SECURITY & AUTHENTICATION"]
+    ROOT --> GAME["MULTIPLAYER GAMING"]
+    ROOT --> INFRA["INFRASTRUCTURE"]
+    ROOT --> DEPLOY["DEPLOYMENT"]
+
+    SECURITY --> S1["JWT Authentication"]
+    SECURITY --> S2["Refresh Token Rotation"]
+    SECURITY --> S3["Two-Factor Authentication"]
+    SECURITY --> S4["OTP Verification"]
+    SECURITY --> S5["HttpOnly Cookies"]
+    SECURITY --> S6["Account Lockout"]
+    SECURITY --> S7["Email Verification"]
+    SECURITY --> S8["RBAC"]
+    SECURITY --> S9["Redis Rate Limiting"]
+
+    GAME --> G1["WebSocket Integration"]
+    GAME --> G2["Private Game Rooms"]
+    GAME --> G3["6-Digit Room Codes"]
+    GAME --> G4["Live Game Updates"]
+    GAME --> G5["Victory Animations"]
+
+    INFRA --> I1["PostgreSQL"]
+    INFRA --> I2["Redis"]
+    INFRA --> I3["Flyway"]
+    INFRA --> I4["Docker"]
+
+    DEPLOY --> D1["Vercel Frontend"]
+    DEPLOY --> D2["Cloud Backend"]
+    DEPLOY --> D3["Supabase Database"]
+    DEPLOY --> D4["Upstash Redis"]
+```
+
+---
+
+## 13. LOCAL DEVELOPMENT WORKFLOW
+
+```mermaid
+flowchart TD
+    START(["START DEVELOPMENT"])
+
+    START --> CLONE["Clone GitHub Repository"]
+    CLONE --> DB["Configure PostgreSQL"]
+    DB --> REDIS["Configure Redis"]
+    REDIS --> BACKEND["Navigate to auth-service"]
+
+    BACKEND --> BUILD["mvn clean install"]
+    BUILD --> RUNBACK["mvn spring-boot:run"]
+
+    RUNBACK --> FRONTEND["Navigate to authify"]
+    FRONTEND --> INSTALL["npm install"]
+    INSTALL --> RUNFRONT["npm run dev"]
+
+    RUNFRONT --> TEST["Test Authentication & Multiplayer"]
+    TEST --> END(["APPLICATION RUNNING"])
+```
+
+### COMMAND REFERENCE
+
 ```bash
+# Clone repository
 git clone https://github.com/AnshCyberSec/nexus-arena.git
-```
 
-**Step 2: Navigate to Backend Directory**
-```bash
-cd nexus-arena/auth-service
-```
+cd nexus-arena
 
-**Step 3: Build the Project**
-```bash
+# Backend
+cd auth-service
 mvn clean install
-```
-
-**Step 4: Run the Backend Application**
-```bash
 mvn spring-boot:run
-```
 
-> **Note:** Ensure PostgreSQL and Redis are running locally. Alternatively, configure your cloud database and Redis credentials in `application.yaml`.
-
-### 2. Frontend Setup (React + Vite)
-
-**Step 1: Navigate to Frontend Directory**
-```bash
+# Frontend - open a separate terminal
 cd nexus-arena/authify
-```
-
-**Step 2: Install Dependencies**
-```bash
 npm install
-```
-
-**Step 3: Start the Development Server**
-```bash
 npm run dev
 ```
 
-The frontend will now be accessible through the local development URL provided by Vite.
+---
+
+## 14. ENGINEERING HIGHLIGHTS
+
+```mermaid
+mindmap
+  root((NEXUS ARENA))
+    Backend Engineering
+      Java 21
+      Spring Boot
+      REST APIs
+      Spring Security
+    Security Engineering
+      RSA-256 JWT
+      Refresh Token Rotation
+      MFA / TOTP
+      RBAC
+      Rate Limiting
+    Real-Time Systems
+      WebSocket
+      STOMP
+      Multiplayer Rooms
+      Live Game State
+    Data Engineering
+      PostgreSQL
+      Hibernate
+      Redis
+      Flyway
+    Frontend Engineering
+      React
+      Context API
+      Axios
+      Tailwind CSS
+    Deployment
+      Docker
+      Vercel
+      Render / Fly.io
+      Supabase
+```
 
 ---
 
-## 🌐 Live Deployment Architecture
-
-Nexus Arena follows a modern cloud-based deployment architecture, combining globally distributed frontend hosting with scalable backend infrastructure.
-
-| Component | Technology / Platform | Description |
-| :--- | :--- | :--- |
-| **Frontend** | Vercel | React application hosted on a global edge network. |
-| **Backend** | Render / Fly.io | Dockerized Spring Boot application hosting. |
-| **Database** | Supabase | Serverless PostgreSQL database. |
-| **Caching** | Upstash Redis | Serverless Redis infrastructure for caching and rate limiting. |
-| **Email Service** | Gmail SMTP | Email delivery for verification and authentication workflows. |
+## 15. AUTHOR
 
 <div align="center">
 
-**🚀 Experience Nexus Arena Live**
+### ANSHUMAN DALABE HERA
 
-[![Live Demo](https://img.shields.io/badge/PLAY_NEXUS_ARENA-FF5722?style=for-the-badge&logo=vercel&logoColor=white)](https://nexus-arena-lovat.vercel.app/login)
+**Full Stack Developer | Java Backend Developer | Cybersecurity Enthusiast**
 
-</div>
+[GitHub — AnshCyberSec](https://github.com/AnshCyberSec)
 
----
+### BUILD. SECURE. CONNECT. COMPETE.
 
-<div align="center">
+**WELCOME TO NEXUS ARENA.**
 
-### 👨‍💻 Built By
-
-**Anshuman Dalabehera**
-
-*Full Stack Developer & Cybersecurity Enthusiast*
-
-
-**⭐ If you like Nexus Arena, consider giving the repository a star!**
+⭐ If you like this project, consider giving it a star!
 
 </div>
